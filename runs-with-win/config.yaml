@@ -1,0 +1,59 @@
+# runs-with-win 实验配置文件
+# 本文件位于 runs-with-win/ 下，所有路径均为【相对本文件所在目录】的相对路径。
+# 由于不访问网络，数据全部来自本地；修改后直接生效，无需改代码。
+#
+# 路径基准：runs-with-win/（即本文件所在目录）
+# 例：noveltxt: ../../local_ex1/noveltxt
+#     表示从 runs-with-win/ 向上两级到 D:\MyCodeSpace\NanoChat\，再进 local_ex1\noveltxt
+#     （runs-with-win -> nanochat -> D:\MyCodeSpace\NanoChat）
+
+# 预训练语料：本地中文小说目录（GBK 编码的 .txt）
+noveltxt: ../../local_ex1/noveltxt
+
+# 训练好的 BPE 分词模型（tokenizer_5k 目录，包含 tokenizer.pkl 等）
+tokenizer: tokenizer_5k
+
+# 可选：HuggingFace 数据集（本实验不使用，仅作占位说明）
+huggingface:
+  enabled: false
+  note: "不访问网络，全部数据走本地 noveltxt"
+
+# -----------------------------------------------------------------------------
+# 实验1：tokenizer 训练参数
+tokenizer_train:
+  max_chars_512: 10000000    # 阶段1(512词表) 最大字符数
+  max_chars_5k: 100000000    # 阶段2(5K词表) 最大字符数
+  vocab_512: 512             # 阶段1 词表大小
+  vocab_5k: 5120             # 阶段2 词表大小
+
+# -----------------------------------------------------------------------------
+# 实验2：预训练（输出 checkpoint）
+pretrain:
+  checkpoint_dir: checkpoint          # 预训练检查点输出目录（相对 runs-with-win/）
+  max_chars: 2000000                  # 读取小说字符数
+  seq_len: 128                        # 序列长度
+  batch_size: 8                       # 批大小
+  steps: 1000                         # 训练步数
+  n_layer: 5
+  n_embd: 256
+  n_head: 4
+  n_kv_head: 4
+  window_pattern: "L"
+  matrix_lr: 0.1
+
+# -----------------------------------------------------------------------------
+# 实验3：SFT 数据管线 + 样本生成
+sft_data:
+  sample_dir: sample_data             # 样本 JSON 输出目录（相对 runs-with-win/）
+  seq_len: 128
+  batch_size: 4
+  sample_size: 30                     # 每个数据集生成样本数
+
+# -----------------------------------------------------------------------------
+# 实验4：SFT 微调（输入 exp2 checkpoint，输出 SFT checkpoint）
+sft:
+  checkpoint_dir: sft_checkpoint      # SFT 检查点输出目录（相对 runs-with-win/）
+  seq_len: 128
+  batch_size: 4
+  steps: 50
+  lr: 0.01

@@ -11,3 +11,8 @@ eval_bundle/
 # Local setup
 CLAUDE.md
 wandb/
+
+# runs-with-win/runs-with-autodl 实验产物（不更新到远程，见 nanochat更新规则.txt）
+runs-with-win/checkpoint/
+runs-with-win/sft_checkpoint/
+runs-with-autodl/data/

@@ -70,12 +70,23 @@ logger = logging.getLogger(__name__)
 
 def get_base_dir():
     # co-locate nanochat intermediates with other cached data in ~/.cache (by default)
+    # or .nanochat inside the project root if running from within a nanochat project
     if os.environ.get("NANOCHAT_BASE_DIR"):
         nanochat_dir = os.environ.get("NANOCHAT_BASE_DIR")
     else:
-        home_dir = os.path.expanduser("~")
-        cache_dir = os.path.join(home_dir, ".cache")
-        nanochat_dir = os.path.join(cache_dir, "nanochat")
+        # walk up from cwd to find project root (where this package lives)
+        project_root = None
+        cwd = os.getcwd()
+        # check if we are inside a nanochat repo
+        for parent in [cwd] + [os.path.dirname(cwd)]:
+            if parent and os.path.isdir(os.path.join(parent, "nanochat", "nanochat")):
+                project_root = parent
+                break
+        if project_root:
+            nanochat_dir = os.path.join(project_root, ".nanochat")
+        else:
+            home_dir = os.path.expanduser("~")
+            nanochat_dir = os.path.join(home_dir, ".cache", "nanochat")
     os.makedirs(nanochat_dir, exist_ok=True)
     return nanochat_dir
 

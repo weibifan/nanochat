@@ -1,6 +1,6 @@
 # 同步与更新指南（nanochat 中文翻译）
 
-本仓库是 `karpathy/nanochat` 的 fork，用于维护中文翻译（`README_zh.md`）与代码笔记。
+本仓库是 `karpathy/nanochat` 的 fork，用于维护中文翻译（`README.zh-CN.md`）与代码笔记。
 
 - `origin`（你自己的 fork）：`https://github.com/weibifan/nanochat.git`
 - `upstream`（上游官方）：`https://github.com/karpathy/nanochat.git`
@@ -10,7 +10,7 @@
 每次上游 nanochat 更新后，按以下两步操作：
 
 1. **同步上游代码** 到本地，再推送到自己的 fork。
-2. **对比英文 README 的变化**，据此更新你的中文翻译 `README_zh.md`。
+2. **对比英文 README 的变化**，据此更新你的中文翻译 `README.zh-CN.md`。
 
 ## 第 1 步：同步上游更新
 
@@ -27,7 +27,7 @@ git push origin master
 
 ### 关于冲突
 
-- `README_zh.md` 是上游**不存在的文件**，合并时一般不会冲突。
+- `README.zh-CN.md` 是上游**不存在的文件**，合并时一般不会冲突。
 - 只有当你**同时**改了上游也改过的同一处代码时才会冲突。若冲突，解决后：
 
 ```bash
@@ -38,7 +38,7 @@ git push origin master
 
 ## 第 2 步：根据英文 README 更新翻译
 
-合并上游后，你的 `README_zh.md` 仍是旧版。用 diff 精确定位英文版改动的行，只更新对应段落，无需重读全文：
+合并上游后，你的 `README.zh-CN.md` 仍是旧版。用 diff 精确定位英文版改动的行，只更新对应段落，无需重读全文：
 
 ```bash
 # 查看上游最新 README 相对本地 master 的改动
@@ -48,7 +48,7 @@ git diff master upstream/master -- README.md
 git show upstream/master -- README.md
 ```
 
-基于 diff 结果，更新 `README_zh.md` 中对应的中文段落，然后：
+基于 diff 结果，更新 `README.zh-CN.md` 中对应的中文段落，然后：
 
 ```bash
 git add README_zh.md

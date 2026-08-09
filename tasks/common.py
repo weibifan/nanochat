@@ -45,41 +45,31 @@ class HubDataset:
 def load_hub_dataset(repo_id, subset="default", split="train"):
     """
     Minimal stand-in for HuggingFace datasets.load_dataset(repo_id, subset, split=split).
-    Uses huggingface_hub to list and download parquet files.
-    Supports HF_ENDPOINT env var for mirror sites (e.g. hf-mirror.com).
-    Under torchrun, only one rank downloads, the others wait.
+    Every dataset on the hub has an auto-generated parquet export. We list the parquet
+    shards via the hub API, download them (once) into the local cache directory, and
+    read them with pyarrow. Under torchrun, only one rank downloads, the others wait.
     """
-    from huggingface_hub import HfApi, hf_hub_url
     base_dir = get_base_dir()
     slug = repo_id.replace("/", "--")
     shards_dir = os.path.join(base_dir, "task_data", slug, subset, split)
+    # the manifest is written last, so its existence means the download completed
     manifest_path = os.path.join(shards_dir, "manifest.json")
     if not os.path.exists(manifest_path):
         os.makedirs(shards_dir, exist_ok=True)
         with FileLock(manifest_path + ".lock"):
+            # only a single rank acquires the lock and downloads, the others block
+            # here and then skip the download because they recheck the manifest
             if not os.path.exists(manifest_path):
-                api = HfApi()
-                all_files = api.list_repo_files(repo_id, repo_type="dataset")
-                # Parquet files are stored as {subset}/{split}-{shard}.parquet
-                # The "default" config uses "data/" as the directory
-                subdir = "data" if subset == "default" else subset
-                split_files = sorted(
-                    f for f in all_files
-                    if f.endswith(".parquet") and f.startswith(f"{subdir}/{split}-")
-                )
-                assert split_files, (
-                    f"No parquet files found for {repo_id}/{subset}/{split}. "
-                    f"Available: {[f for f in all_files if f.endswith('.parquet')][:10]}"
-                )
+                listing_url = f"https://huggingface.co/api/datasets/{repo_id}/parquet/{subset}/{split}"
+                with urllib.request.urlopen(listing_url) as response:
+                    shard_urls = json.loads(response.read())
                 filenames = []
-                for shard_index, hf_path in enumerate(split_files):
+                for shard_index, shard_url in enumerate(shard_urls):
                     filename = f"{shard_index:05d}.parquet"
-                    local_path = os.path.join(shards_dir, filename)
-                    url = hf_hub_url(repo_id, hf_path, repo_type="dataset")
-                    print(f"Downloading {url} ...")
-                    with urllib.request.urlopen(url) as response:
+                    print(f"Downloading {shard_url} ...")
+                    with urllib.request.urlopen(shard_url) as response:
                         content = response.read()
-                    with open(local_path, "wb") as f:
+                    with open(os.path.join(shards_dir, filename), "wb") as f:
                         f.write(content)
                     filenames.append(filename)
                 with open(manifest_path, "w") as f:

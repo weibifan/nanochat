@@ -1,0 +1,6 @@
+目标：对runcpu.sh进行改造。
+1）sh脚本无法在windows上运行，需要变成多个步骤，每个步骤是 python stepx.py。假定当前目录是：D:\MyCodeSpace\NanoChat\nanochat。也就是说我在这个目录下执行python程序。
+2）阅读 中文数据集选型.md的第4节，将修改代码变成生成新代码。
+比如原本是修改nanochat/dataset.py，现在变成不改原来代码，修改后生成nanochat/dataset_ch.py
+3）建议将数据集下载作为一个步骤。将数据集先下载到本地（放到D:\MyCodeSpace\NanoChat\nanochat\data下，最好使用相对目录），再构建模型。
+4）先和我讨论，形成方案，然后再修改代码。

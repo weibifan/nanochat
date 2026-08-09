@@ -1,0 +1,7 @@
+目标：在autodl的租用服务器上构建nanochat模型。
+1）服务器的配置为单个GPU：RTX4090D
+2）服务器无法访问huggingface，github网站，但是可以访问DodelScope，Gitee等国内网站。
+3）请对speedrun.sh进行改造，形成gpustepX等多个步骤。存放位置为 任务2.txt 的当前目录
+4）支持2个配置，一个时完整运行共30分钟，另外一个时完整运行20小时。
+5）可以在gpustepX所在目录下新建文件，但如果要修改gpustepX之外的文件，请进行讨论。
+6）nanochat仓库从gitee上下载。
